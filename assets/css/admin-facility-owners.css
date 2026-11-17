@@ -1,5 +1,56 @@
 /* PawPrint Duke — Facility Owners admin screen (loaded only on that screen). */
 
+/* Facility Owner column: icon + name + "Owner: …" */
+.pawprint-fo .column-facility_owner {
+    width: 26%;
+}
+
+.pawprint-fo-owner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pawprint-fo-owner__icon {
+    flex: 0 0 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #e8f1fc;
+    color: #2271b1;
+}
+
+.pawprint-fo-owner__icon .dashicons {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+}
+
+.pawprint-fo-owner__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.pawprint-fo-owner__text .row-title {
+    font-size: 14px;
+    color: #1d2327;
+}
+
+.pawprint-fo-owner__text .row-title:hover,
+.pawprint-fo-owner__text .row-title:focus {
+    color: #2271b1;
+}
+
+.pawprint-fo-owner__meta {
+    margin-top: 2px;
+    color: #646970;
+    font-size: 13px;
+}
+
 .pawprint-fo .column-status {
     width: 110px;
 }

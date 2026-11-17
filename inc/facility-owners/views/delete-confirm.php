@@ -21,6 +21,7 @@ $id = (int) $owner->id;
         <tr><th scope="row"><?php esc_html_e('Owner Name', 'pawprint-duke'); ?></th><td><?php echo esc_html($owner->owner_name); ?></td></tr>
         <tr><th scope="row"><?php esc_html_e('Email', 'pawprint-duke'); ?></th><td><?php echo esc_html($owner->email); ?></td></tr>
         <tr><th scope="row"><?php esc_html_e('Phone', 'pawprint-duke'); ?></th><td><?php echo esc_html($owner->phone); ?></td></tr>
+        <tr><th scope="row"><?php esc_html_e('Platform URL', 'pawprint-duke'); ?></th><td><?php echo esc_html($owner->platform_url); ?></td></tr>
         </tbody>
     </table>
 

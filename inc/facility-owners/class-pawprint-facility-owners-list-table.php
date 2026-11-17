@@ -27,10 +27,10 @@ class PawPrint_Facility_Owners_List_Table extends WP_List_Table
     public function get_columns()
     {
         return [
-            'facility_name' => __('Facility Name', 'pawprint-duke'),
-            'owner_name'    => __('Owner Name', 'pawprint-duke'),
+            'facility_owner' => __('Facility Owner', 'pawprint-duke'),
             'email'         => __('Email', 'pawprint-duke'),
             'phone'         => __('Phone', 'pawprint-duke'),
+            'platform_url'  => __('Platform URL', 'pawprint-duke'),
             'status'        => __('Status', 'pawprint-duke'),
             'actions'       => __('Actions', 'pawprint-duke'),
         ];
@@ -39,8 +39,7 @@ class PawPrint_Facility_Owners_List_Table extends WP_List_Table
     protected function get_sortable_columns()
     {
         return [
-            'facility_name' => ['facility_name', false],
-            'owner_name'    => ['owner_name', false],
+            'facility_owner' => ['facility_name', false],
             'email'         => ['email', false],
             'status'        => ['status', false],
         ];
@@ -48,7 +47,7 @@ class PawPrint_Facility_Owners_List_Table extends WP_List_Table
 
     protected function get_primary_column_name()
     {
-        return 'facility_name';
+        return 'facility_owner';
     }
 
     /**
@@ -121,18 +120,42 @@ class PawPrint_Facility_Owners_List_Table extends WP_List_Table
         return isset($item->$column_name) ? esc_html($item->$column_name) : '';
     }
 
-    protected function column_facility_name($item)
+    /**
+     * Facility name (bold, links to edit) with "Owner: …" underneath and a paw icon.
+     */
+    protected function column_facility_owner($item)
     {
         return sprintf(
-            '<strong><a class="row-title" href="%s">%s</a></strong>',
+            '<div class="pawprint-fo-owner">
+                <span class="pawprint-fo-owner__icon" aria-hidden="true"><span class="dashicons dashicons-pets"></span></span>
+                <div class="pawprint-fo-owner__text">
+                    <strong><a class="row-title" href="%1$s">%2$s</a></strong>
+                    <span class="pawprint-fo-owner__meta">%3$s</span>
+                </div>
+            </div>',
             esc_url(PawPrint_Facility_Owners_Admin::page_url(['action' => 'edit', 'id' => $item->id])),
-            esc_html($item->facility_name)
+            esc_html($item->facility_name),
+            /* translators: %s: owner name */
+            esc_html(sprintf(__('Owner: %s', 'pawprint-duke'), $item->owner_name))
         );
     }
 
     protected function column_email($item)
     {
         return sprintf('<a href="%s">%s</a>', esc_url('mailto:' . $item->email), esc_html($item->email));
+    }
+
+    protected function column_platform_url($item)
+    {
+        if ('' === (string) $item->platform_url) {
+            return '&mdash;';
+        }
+
+        return sprintf(
+            '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+            esc_url($item->platform_url),
+            esc_html($item->platform_url)
+        );
     }
 
     protected function column_status($item)

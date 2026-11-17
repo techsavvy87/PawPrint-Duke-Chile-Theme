@@ -128,7 +128,8 @@ class PawPrint_Facility_Owners_Admin
             'pawprint-fo-admin',
             get_stylesheet_directory_uri() . '/assets/css/admin-facility-owners.css',
             [],
-            wp_get_theme()->get('Version')
+            // Cache-bust whenever the file changes.
+            (string) filemtime(get_stylesheet_directory() . '/assets/css/admin-facility-owners.css')
         );
     }
 
@@ -296,7 +297,7 @@ class PawPrint_Facility_Owners_Admin
      */
     private static function render_form($owner): void
     {
-        $defaults = ['facility_name' => '', 'owner_name' => '', 'email' => '', 'phone' => ''];
+        $defaults = ['facility_name' => '', 'owner_name' => '', 'email' => '', 'phone' => '', 'platform_url' => ''];
         $values   = $owner ? array_intersect_key((array) $owner, $defaults) : $defaults;
 
         // After a failed submission, show what the user typed.

@@ -21,6 +21,7 @@ $fields = [
     'owner_name'    => ['label' => __('Owner Name', 'pawprint-duke'), 'type' => 'text', 'maxlength' => 191, 'autocomplete' => 'name'],
     'email'         => ['label' => __('Email', 'pawprint-duke'), 'type' => 'email', 'maxlength' => 100, 'autocomplete' => 'email'],
     'phone'         => ['label' => __('Phone', 'pawprint-duke'), 'type' => 'tel', 'maxlength' => 30, 'autocomplete' => 'tel'],
+    'platform_url'  => ['label' => __('Platform URL', 'pawprint-duke'), 'type' => 'url', 'maxlength' => 255, 'autocomplete' => 'url', 'placeholder' => 'https://'],
 ];
 ?>
 <div class="wrap pawprint-fo">
@@ -68,6 +69,7 @@ $fields = [
                             value="<?php echo esc_attr($values[$name] ?? ''); ?>"
                             maxlength="<?php echo (int) $field['maxlength']; ?>"
                             autocomplete="<?php echo esc_attr($field['autocomplete']); ?>"
+                            <?php if (!empty($field['placeholder'])) : ?>placeholder="<?php echo esc_attr($field['placeholder']); ?>"<?php endif; ?>
                             class="regular-text"
                             required
                             aria-required="true"

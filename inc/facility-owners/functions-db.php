@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const PAWPRINT_FO_DB_VERSION        = '1.0.0';
+const PAWPRINT_FO_DB_VERSION        = '1.1.0'; // 1.1.0: added platform_url.
 const PAWPRINT_FO_DB_VERSION_OPTION = 'pawprint_fo_db_version';
 const PAWPRINT_FO_STATUS_ACTIVE     = 'active';
 const PAWPRINT_FO_STATUS_INACTIVE   = 'inactive';
@@ -55,6 +55,7 @@ function pawprint_fo_install_table(): void
   owner_name varchar(191) NOT NULL,
   email varchar(100) NOT NULL,
   phone varchar(30) NOT NULL,
+  platform_url varchar(255) NOT NULL DEFAULT '',
   status varchar(20) NOT NULL DEFAULT 'active',
   created_at datetime NOT NULL,
   updated_at datetime NOT NULL,
@@ -123,8 +124,8 @@ function pawprint_fo_query(array $args = []): array
 
     if ('' !== $args['search']) {
         $like     = '%' . $wpdb->esc_like($args['search']) . '%';
-        $where[]  = '(facility_name LIKE %s OR owner_name LIKE %s OR email LIKE %s OR phone LIKE %s)';
-        $params   = array_merge($params, [$like, $like, $like, $like]);
+        $where[]  = '(facility_name LIKE %s OR owner_name LIKE %s OR email LIKE %s OR phone LIKE %s OR platform_url LIKE %s)';
+        $params   = array_merge($params, [$like, $like, $like, $like, $like]);
     }
 
     if (isset(pawprint_fo_statuses()[$args['status']])) {
@@ -201,6 +202,7 @@ function pawprint_fo_prepare_input(array $raw, int $exclude_id = 0): array
         'owner_name'    => sanitize_text_field($raw['owner_name'] ?? ''),
         'email'         => sanitize_email($raw['email'] ?? ''),
         'phone'         => sanitize_text_field($raw['phone'] ?? ''),
+        'platform_url'  => esc_url_raw(trim((string) ($raw['platform_url'] ?? '')), ['http', 'https']),
     ];
 
     $errors = new WP_Error();
@@ -231,6 +233,17 @@ function pawprint_fo_prepare_input(array $raw, int $exclude_id = 0): array
         $errors->add('phone', __('Phone may contain digits, spaces, +, -, ( ) and . (7–30 characters).', 'pawprint-duke'));
     }
 
+    if ('' === trim((string) ($raw['platform_url'] ?? ''))) {
+        $errors->add('platform_url', __('Platform URL is required.', 'pawprint-duke'));
+    } elseif (
+        '' === $data['platform_url']
+        || !filter_var($data['platform_url'], FILTER_VALIDATE_URL)
+        || !in_array(wp_parse_url($data['platform_url'], PHP_URL_SCHEME), ['http', 'https'], true)
+        || strlen($data['platform_url']) > 255
+    ) {
+        $errors->add('platform_url', __('Please enter a valid Platform URL starting with http:// or https://.', 'pawprint-duke'));
+    }
+
     return ['data' => $data, 'errors' => $errors];
 }
 
@@ -251,11 +264,12 @@ function pawprint_fo_insert(array $data)
             'owner_name'    => $data['owner_name'],
             'email'         => $data['email'],
             'phone'         => $data['phone'],
+            'platform_url'  => $data['platform_url'],
             'status'        => PAWPRINT_FO_STATUS_ACTIVE,
             'created_at'    => $now,
             'updated_at'    => $now,
         ],
-        ['%s', '%s', '%s', '%s', '%s', '%s', '%s']
+        ['%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s']
     );
 
     if (false === $ok) {
@@ -269,7 +283,7 @@ function pawprint_fo_insert(array $data)
 }
 
 /**
- * Update the four editable fields of a facility owner.
+ * Update the editable fields of a facility owner.
  *
  * @return true|WP_Error
  */
@@ -284,10 +298,11 @@ function pawprint_fo_update(int $id, array $data)
             'owner_name'    => $data['owner_name'],
             'email'         => $data['email'],
             'phone'         => $data['phone'],
+            'platform_url'  => $data['platform_url'],
             'updated_at'    => current_time('mysql', true),
         ],
         ['id' => $id],
-        ['%s', '%s', '%s', '%s', '%s'],
+        ['%s', '%s', '%s', '%s', '%s', '%s'],
         ['%d']
     );
 
